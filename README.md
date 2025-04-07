@@ -1,2 +1,2 @@
 # gh-actions-check
-temporary repo for checking gihthub action translation
+temporary repo for checking github action translation

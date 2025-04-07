@@ -1,0 +1,74 @@
+name: Run the tests on pull requests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-pytest:
+    name: 'Run Pytest tests'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git clone
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # --- Jenkins Setup Section (Identical to the Java version) ---
+      # tar -cvf jenkins_backup.tar ./jenkins_backup
+      # split -b 90m -d jenkins_backup.tar jenkins_backup
+
+      #- name: Prepare Jenkins data
+      #  run: |
+      #    cat ${{ github.workspace }}/jenkins_data/jenkins_backup0* > ${{ github.workspace }}/jenkins_backup.tar
+      #    md5sum ${{ github.workspace }}/jenkins_backup.tar
+      #
+      #- name: Extract Jenkins data and set permission
+      #  run: |
+      #    tar -xvf ./jenkins_backup.tar
+      #    chmod -R 777 ./jenkins_backup/var/jenkins_home
+      #
+      #- name: Docker login
+      #  # Ensure DOCKER_USERNAME and DOCKER_PASSWORD secrets are set in repo settings
+      #  # Needed for pulling jenkins image potentially, or avoiding rate limits
+      #  run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      #- name: Docker start Jenkins
+      #  # Starts Jenkins container using the prepared data volume
+      #  run: docker run --rm --detach -p 8080:8080 -v ${{ github.workspace }}/jenkins_backup/var/jenkins_home:/var/jenkins_home jenkins/jenkins:2.492.2-lts-jdk17
+      #
+      #- name: Wait for Jenkins
+      #  # Assumes the script checks localhost:8080 until Jenkins is ready
+      #  run: ./.github/wait-for-jenkins.sh
+
+      # --- Test Execution Section ---
+      - name: Run Pytest tests # Changed from Maven test
+        run: pytest # Use pytest command. Add options if needed (e.g., pytest tests/ -v)
+        #env: # Environment variables remain the same, assuming Python tests read them
+        #  JENKINS_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+        #  JENKINS_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        #  JENKINS_HOST: localhost # Jenkins is running in docker on the runner host
+        #  JENKINS_PORT: 8080 # Mapped port
+        #  BROWSER_NAME: chrome # Assuming Selenium/browser tests
+        #  BROWSER_OPTIONS_CHROME: --remote-allow-origins=*;--disable-gpu;--no-sandbox;--disable-dev-shm-usage;--headless=new;--window-size=1920,1080
+        #  RUN_CI: true # Flag for CI-specific logic in tests
+
+      # --- Artifact Upload Section (Identical structure) ---
+      #- name: Attach screenshots on failure # Changed step name slightly
+      #  if: failure() # Only run if previous steps fail (likely pytest)
+      #  uses: actions/upload-artifact@v4
+      #  with:
+      #    name: screenshots # Artifact name
+      #    path: ${{ github.workspace }}/screenshots # Assumes pytest/tests save screenshots here
