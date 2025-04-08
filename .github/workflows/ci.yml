@@ -57,11 +57,11 @@ jobs:
       # --- Test Execution Section ---
       - name: Run Pytest tests # Changed from Maven test
         run: pytest # Use pytest command. Add options if needed (e.g., pytest tests/ -v)
-        #env: # Environment variables remain the same, assuming Python tests read them
-        #  JENKINS_USERNAME: ${{ secrets.ADMIN_USERNAME }}
-        #  JENKINS_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-        #  JENKINS_HOST: localhost # Jenkins is running in docker on the runner host
-        #  JENKINS_PORT: 8080 # Mapped port
+        env: # Environment variables remain the same, assuming Python tests read them
+          JENKINS_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          JENKINS_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          JENKINS_HOST: localhost # Jenkins is running in docker on the runner host
+          JENKINS_PORT: 8080 # Mapped port
         #  BROWSER_NAME: chrome # Assuming Selenium/browser tests
         #  BROWSER_OPTIONS_CHROME: --remote-allow-origins=*;--disable-gpu;--no-sandbox;--disable-dev-shm-usage;--headless=new;--window-size=1920,1080
         #  RUN_CI: true # Flag for CI-specific logic in tests
