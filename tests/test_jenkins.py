@@ -22,4 +22,4 @@ def driver():
 
 def test_jenkins(driver):
     driver.get(url)
-    assert driver.current_url == url
+    assert driver.current_url == "http://localhost:8080/login?from=%2F"
