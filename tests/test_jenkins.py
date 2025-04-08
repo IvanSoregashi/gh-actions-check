@@ -18,12 +18,16 @@ def driver():
     chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--window-size=1920,1080")
     driver = webdriver.Chrome(options=chrome_options)
-    return driver
+    driver.get(url)
+    driver.find_element(By.NAME, "j_username").send_keys(os.getenv("JENKINS_USERNAME"))
+    driver.find_element(By.NAME, "j_password").send_keys(os.getenv("JENKINS_PASSWORD"))
+    driver.find_element(By.NAME, "Submit").click()
+    yield driver
+    driver.quit()
 
 def test_jenkins(driver):
-    driver.get(url)
-    driver.find_element(By.NAME, "j_username").send_keys(os.getenv("ADMIN_USERNAME"))
-    driver.find_element(By.NAME, "j_password").send_keys(os.getenv("ADMIN_PASSWORD"))
-    driver.find_element(By.NAME, "Submit").click()
-
     assert driver.current_url == "https://localhost:8080"
+
+def test_item(driver):
+    element = driver.find_element(By.LINK_TEXT, "Test item")
+    assert element.get_attribute("href") == "job/Test%20item/"
