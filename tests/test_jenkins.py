@@ -1,3 +1,5 @@
+import time
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -22,6 +24,7 @@ def driver():
     driver.find_element(By.NAME, "j_username").send_keys(os.getenv("JENKINS_USERNAME"))
     driver.find_element(By.NAME, "j_password").send_keys(os.getenv("JENKINS_PASSWORD"))
     driver.find_element(By.NAME, "Submit").click()
+    time.sleep(2)
     yield driver
     driver.quit()
 
