@@ -26,8 +26,8 @@ def driver():
     driver.quit()
 
 def test_jenkins(driver):
-    assert driver.current_url == "https://localhost:8080"
+    assert driver.current_url == "http://localhost:8080/"
 
 def test_item(driver):
     element = driver.find_element(By.LINK_TEXT, "Test item")
-    assert element.get_attribute("href") == "job/Test%20item/"
+    assert element.get_attribute("href") == "http://localhost:8080/job/Test%20item/"
