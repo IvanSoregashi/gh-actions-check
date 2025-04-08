@@ -39,6 +39,7 @@ jobs:
         run: |
           tar -xvf ./jenkins_backup.tar
           chmod -R 777 ./jenkins_backup/var/jenkins_home
+          chmod -R 777 ./.github/wait-for-jenkins.sh
 
       #- name: Docker login
       #  # Ensure DOCKER_USERNAME and DOCKER_PASSWORD secrets are set in repo settings
