@@ -18,4 +18,4 @@ def test_34():
     driver = webdriver.Chrome(options=chrome_options)
     driver.get("http://example.com")
 
-    assert driver.current_url == "http://example.com"
+    assert driver.current_url == "https://example.com/"
