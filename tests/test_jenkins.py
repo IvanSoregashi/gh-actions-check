@@ -1,11 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 import os
 import pytest
 
 url = "http://" + os.getenv("JENKINS_HOST") + ":" + os.getenv("JENKINS_PORT") + "/"
-url = "http://localhost:8080/"
 
 
 @pytest.fixture
@@ -22,4 +22,8 @@ def driver():
 
 def test_jenkins(driver):
     driver.get(url)
-    assert driver.current_url == "http://localhost:8080/login?from=%2F"
+    driver.find_element(By.NAME, "j_username").send_keys(os.getenv("ADMIN_USERNAME"))
+    driver.find_element(By.NAME, "j_password").send_keys(os.getenv("ADMIN_PASSWORD"))
+    driver.find_element(By.NAME, "Submit").click()
+
+    assert driver.current_url == "https://localhost:8080"
