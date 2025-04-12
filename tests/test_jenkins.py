@@ -32,6 +32,6 @@ def test_jenkins(driver):
     assert driver.current_url == "http://localhost:8080/"
 
 def test_item(driver):
-    time.sleep(60)
+    time.sleep(61)
     element = driver.find_element(By.LINK_TEXT, "Test item")
     assert element.get_attribute("href") == "http://localhost:8080/job/Test%20item/"
