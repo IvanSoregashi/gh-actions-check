@@ -1,0 +1,75 @@
+name: Run the tests on pull requests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run-pytest:
+    name: 'run pytest tests'
+    runs-on: ubuntu-latest
+    env:
+      JENKINS_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+      JENKINS_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      JENKINS_HOST: localhost
+      JENKINS_PORT: 8080
+      BROWSER_NAME: chrome
+      BROWSER_OPTIONS_CHROME: --remote-allow-origins=*;--disable-gpu;--no-sandbox;--disable-dev-shm-usage;--headless=new;--window-size=1920,1080
+
+    steps:
+      - name: git clone
+        uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
+
+      - name: set up python
+        uses: actions/setup-python@v5.2.0
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: prepare jenkins data
+        run: |
+          cat ${{ github.workspace }}/jenkins_data/jenkins_backup0* > ${{ github.workspace }}/jenkins_backup.tar
+          md5sum ${{ github.workspace }}/jenkins_backup.tar
+
+      - name: extract jenkins data and set permission
+        run: |
+          tar -xvf ./jenkins_backup.tar
+          chmod -R 777 ./jenkins_backup/var/jenkins_home
+          chmod -R 777 ./.github/
+
+      - name: Docker start
+        run: docker run --rm --detach -p 8080:8080 -v ${{ github.workspace }}/jenkins_backup/var/jenkins_home:/var/jenkins_home jenkins/jenkins:2.492.2-lts-jdk17
+
+      - name: Wait for the Jenkins
+        run: ./.github/wait-for-jenkins.sh
+
+      - name: check scope of changes
+        id: scope_check
+        run: ./.github/diff-checker.sh
+
+      - name: pytest run all tests
+        if: steps.scope_check.outputs.run_all_tests == 'true'
+        run: pytest
+
+      - name: pytest run picked tests
+        if: steps.scope_check.outputs.run_all_tests == 'false'
+        env:
+          PARENT_BRANCH: origin/${{ github.base_ref }}
+        #disabling the picked run for now, needs more testing
+        #run: pytest --picked --mode=branch
+        run: pytest
+
+      - name: Attach screenshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: ${{ github.workspace }}/screenshots
