@@ -10,5 +10,5 @@ def test_login(login_page):
 def test_main_page(main_page):
     logger.info("info")
     logger.debug("debug")
-    assert main_page.title == "Dashboard [Jenkins]" + '1'
+    assert main_page.title == "Dashboard [Jenkins]"
 
