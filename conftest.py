@@ -1,4 +1,5 @@
 import os
+import subprocess
 import sys
 import logging
 import datetime
@@ -30,6 +31,11 @@ def pytest_runtest_makereport(item, call):
 
 @pytest.fixture(scope="session")
 def config():
+    parent_branch = f"origin/{os.getenv('github.base_ref', 'main')}"
+    output = subprocess.run(["git", "diff", "--name-status", "--relative", parent_branch],
+                            stdout=subprocess.PIPE)
+    for line in output.stdout.decode("utf-8").expandtabs().splitlines():
+        logger.warning(line)
     return Config.load()
 
 
